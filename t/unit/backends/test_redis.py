@@ -1,6 +1,5 @@
 import itertools
 import json
-import random
 import ssl
 from contextlib import contextmanager
 from datetime import timedelta
@@ -16,6 +15,7 @@ from celery.exceptions import BackendStoreError, ChordError, ImproperlyConfigure
 from celery.result import AsyncResult, GroupResult
 from celery.utils.collections import AttributeDict
 from t.unit import conftest
+import secrets
 
 
 def raise_on_second_call(mock, exc, *retval):
@@ -168,7 +168,7 @@ class Sentinel(conftest.MockCallbacks):
         self.connection_kwargs = connection_kwargs
 
     def master_for(self, service_name, redis_class):
-        return random.choice(self.sentinels)
+        return secrets.SystemRandom().choice(self.sentinels)
 
 
 class redis:
@@ -812,7 +812,7 @@ class test_RedisBackend_chords_simple(basetest_RedisBackend):
 
     def test_on_chord_part_return(self):
         tasks = [self.create_task(i) for i in range(10)]
-        random.shuffle(tasks)
+        secrets.SystemRandom().shuffle(tasks)
 
         for i in range(10):
             self.b.on_chord_part_return(tasks[i].request, states.SUCCESS, i)
@@ -833,7 +833,7 @@ class test_RedisBackend_chords_simple(basetest_RedisBackend):
         )
 
         tasks = [self.create_task(i) for i in range(10)]
-        random.shuffle(tasks)
+        secrets.SystemRandom().shuffle(tasks)
 
         for i in range(10):
             self.b.on_chord_part_return(tasks[i].request, states.SUCCESS, i)
@@ -853,7 +853,7 @@ class test_RedisBackend_chords_simple(basetest_RedisBackend):
         )
 
         tasks = [self.create_task(i) for i in range(10)]
-        random.shuffle(tasks)
+        secrets.SystemRandom().shuffle(tasks)
 
         for i in range(10):
             self.b.on_chord_part_return(tasks[i].request, states.SUCCESS, i)
@@ -1134,7 +1134,7 @@ class test_RedisBackend_chords_complex(basetest_RedisBackend):
 
     def test_on_chord_part_return_timeout(self, complex_header_result):
         tasks = [self.create_task(i) for i in range(10)]
-        random.shuffle(tasks)
+        secrets.SystemRandom().shuffle(tasks)
         try:
             self.app.conf.result_chord_join_timeout += 1.0
             for task, result_val in zip(tasks, itertools.cycle((42, ))):
@@ -1155,7 +1155,7 @@ class test_RedisBackend_chords_complex(basetest_RedisBackend):
         mock_result_obj.supports_native_join = supports_native_join
 
         tasks = [self.create_task(i) for i in range(10)]
-        random.shuffle(tasks)
+        secrets.SystemRandom().shuffle(tasks)
 
         with self.chord_context(10) as (tasks, request, callback):
             for task, result_val in zip(tasks, itertools.cycle((42, ))):

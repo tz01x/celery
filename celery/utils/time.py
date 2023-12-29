@@ -3,7 +3,6 @@ from __future__ import annotations
 
 import numbers
 import os
-import random
 import sys
 import time as _time
 from calendar import monthrange
@@ -19,6 +18,7 @@ from kombu.utils.objects import cached_property
 
 from .functional import dictfilter
 from .text import pluralize
+import secrets
 
 if sys.version_info >= (3, 9):
     from zoneinfo import ZoneInfo
@@ -424,6 +424,6 @@ def get_exponential_backoff_interval(
     # Full jitter according to
     # https://aws.amazon.com/blogs/architecture/exponential-backoff-and-jitter/
     if full_jitter:
-        countdown = random.randrange(countdown + 1)
+        countdown = secrets.SystemRandom().randrange(countdown + 1)
     # Adjust according to maximum wait time and account for negative values.
     return max(0, countdown)

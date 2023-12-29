@@ -1,7 +1,6 @@
 import pickle
 from decimal import Decimal
 from itertools import count
-from random import shuffle
 from time import time
 from unittest.mock import Mock, patch
 
@@ -10,6 +9,7 @@ import pytest
 from celery import states, uuid
 from celery.events import Event
 from celery.events.state import HEARTBEAT_DRIFT_MAX, HEARTBEAT_EXPIRE_WINDOW, State, Task, Worker, heartbeat_expires
+import secrets
 
 
 class replay:
@@ -330,7 +330,7 @@ class test_State:
         assert now[1][0] == tC
         assert now[2][0] == tB
         for _ in range(1000):
-            shuffle(r.uids)
+            secrets.SystemRandom().shuffle(r.uids)
             tA, tB, tC = r.uids
             r.rewind_with_offset(r.current_clock + 1, r.uids)
             r.play()
@@ -350,7 +350,7 @@ class test_State:
         assert now[1][0] == tB
         assert now[2][0] == tC
         for _ in range(1000):
-            shuffle(r.uids)
+            secrets.SystemRandom().shuffle(r.uids)
             tA, tB, tC = r.uids
             r.rewind_with_offset(r.current_clock + 1, r.uids)
             r.play()
