@@ -22,6 +22,7 @@ from celery.worker import strategy
 from celery.worker.request import Request, create_request_cls
 from celery.worker.request import logger as req_logger
 from celery.worker.state import revoked, revoked_stamps
+import secrets
 
 
 class RequestCase:
@@ -221,12 +222,11 @@ class test_Request(RequestCase):
             self.add.s(**kwargs)).kwargs == kwargs
 
     def test_info_function(self):
-        import random
         import string
         kwargs = {}
         for i in range(0, 2):
             kwargs[str(i)] = ''.join(
-                random.choice(string.ascii_lowercase) for i in range(1000))
+                secrets.SystemRandom().choice(string.ascii_lowercase) for i in range(1000))
         assert self.get_request(
             self.add.s(**kwargs)).info(safe=True).get(
             'kwargs') == ''  # mock message doesn't populate kwargsrepr
@@ -235,7 +235,7 @@ class test_Request(RequestCase):
         args = []
         for i in range(0, 2):
             args.append(''.join(
-                random.choice(string.ascii_lowercase) for i in range(1000)))
+                secrets.SystemRandom().choice(string.ascii_lowercase) for i in range(1000)))
         assert list(self.get_request(
             self.add.s(*args)).info(safe=True).get(
             'args')) == []  # mock message doesn't populate argsrepr
